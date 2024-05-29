@@ -10,12 +10,18 @@ const apiCall = function (event) {
   axios
     .get(endpoint)
     .then(function (response) {
+      const bookInfoDiv = document.getElementById("book-info");
+      bookInfoDiv.innerHTML = "";
       _.forEach(response.data.works, (work) => {
         const title = work.title;
         const authorNames = _.map(work.authors, "name");
+        const workKey = work.key;
+
         const bookContainer = document.createElement("div");
-        bookContainer.innerHTML = ` ${title} ${authorNames}`;
-        document.body.appendChild(bookContainer);
+        bookContainer.dataset.workKey = workKey;
+        bookContainer.innerHTML = `<h3>${title}</h3><p>${authorNames}</p>`;
+        bookContainer.addEventListener("click", fetchDescription);
+        bookInfoDiv.appendChild(bookContainer);
       });
 
       loadMoreBtn.innerHTML = `<button id="load-more">Load More</button>`;
@@ -28,10 +34,34 @@ const apiCall = function (event) {
     });
 };
 
+const fetchDescription = function () {
+  const workKey = this.dataset.workKey;
+
+  axios
+    .get(`https://openlibrary.org${workKey}.json`)
+    .then((response) => {
+      const description = _.get(
+        //Da sistemare il percorso, perché alcune risposte hanno un percorso diverso
+        response.data,
+        "description" || "value",
+        "Descrizione non disponibile"
+      );
+      const descriptionContainer = document.createElement("p");
+      descriptionContainer.innerText = description;
+      this.appendChild(descriptionContainer);
+      this.removeEventListener("click", fetchDescription);
+      console.log(response);
+    })
+    .catch((error) => {
+      console.error("Errore nella descrizione:", error);
+    });
+};
+
 //Nello scope globale perché richiamato da diverse funzioni
 const loadMoreBtn = document.createElement("button");
 let offset = 0;
 
+//Da sistemare questa funzione per renderla simile ad apicall
 const loadMore = function () {
   loadMoreBtn.innerHTML = `<button style= "display: hidden" id="load-more">Load More</button>`;
   offset += 10;
