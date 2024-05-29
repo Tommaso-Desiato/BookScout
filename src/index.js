@@ -1,35 +1,49 @@
 import _ from "lodash";
 const axios = require("axios");
 
+//Funzione per generare l'endpoint
+const getEndpoint = (query, offset = 0) =>
+  `https://openlibrary.org/subjects/${query}.json?limit=10&offset=${offset}`;
+
+//Funzione per visualizzare i risultati della chiamata API
+const displayResults = (response) => {
+  const bookInfoDiv = document.getElementById("book-info");
+  //Per ogni libro estrae titolo e lista degli autori e chiave del libro
+  _.forEach(response.data.works, (work) => {
+    const title = work.title;
+    const authorNames = _.map(work.authors, "name");
+    const workKey = work.key;
+
+    const bookContainer = document.createElement("div");
+    bookContainer.dataset.workKey = workKey;
+    bookContainer.innerHTML = `<h3>${title}</h3><p>${authorNames}</p>`;
+    bookContainer.addEventListener("click", fetchDescription);
+    bookInfoDiv.appendChild(bookContainer);
+  });
+};
+
 //Funzione per la chiamata API
-const apiCall = function (event) {
+const fetchBooks = (event, offset = 0, isNewSearch = false) => {
   //Prevent Default per non far aggiornare la pagina
-  event.preventDefault();
+  if (event) event.preventDefault();
   const query = document.getElementById("search-bar").value;
-  const endpoint = `https://openlibrary.org/subjects/${query}.json?limit=10`;
+  const endpoint = getEndpoint(query, offset);
+
   axios
     .get(endpoint)
-    .then(function (response) {
-      const bookInfoDiv = document.getElementById("book-info");
-      bookInfoDiv.innerHTML = "";
-      _.forEach(response.data.works, (work) => {
-        const title = work.title;
-        const authorNames = _.map(work.authors, "name");
-        const workKey = work.key;
+    .then((response) => {
+      if (isNewSearch) {
+        document.getElementById("book-info").innerHTML = "";
+        offset = 0;
+      }
 
-        const bookContainer = document.createElement("div");
-        bookContainer.dataset.workKey = workKey;
-        bookContainer.innerHTML = `<h3>${title}</h3><p>${authorNames}</p>`;
-        bookContainer.addEventListener("click", fetchDescription);
-        bookInfoDiv.appendChild(bookContainer);
-      });
+      displayResults(response);
 
       loadMoreBtn.innerHTML = `<button id="load-more">Load More</button>`;
       document.body.appendChild(loadMoreBtn);
       document.getElementById("load-more").addEventListener("click", loadMore);
-      console.log(response);
     })
-    .catch(function (error) {
+    .catch((error) => {
       console.log(error);
     });
 };
@@ -44,7 +58,7 @@ const fetchDescription = function () {
         _.get(response.data, "description.value") ||
         _.get(response.data, "description") ||
         "Descrizione non disponibile";
-      console.log(response.data);
+
       const descriptionContainer = document.createElement("p");
       descriptionContainer.innerText = description;
       this.appendChild(descriptionContainer);
@@ -59,37 +73,13 @@ const fetchDescription = function () {
 const loadMoreBtn = document.createElement("button");
 let offset = 0;
 
-//Da sistemare questa funzione per renderla simile ad apicall
-const loadMore = function () {
+//Funzione per caricare più risultati
+const loadMore = () => {
   loadMoreBtn.innerHTML = `<button style= "display: hidden" id="load-more">Load More</button>`;
   offset += 10;
-  const query = document.getElementById("search-bar").value;
-  const endpoint = `https://openlibrary.org/subjects/${query}.json?limit=10&offset=${offset}`;
-  axios
-    .get(endpoint)
-    .then(function (response) {
-      const bookInfoDiv = document.getElementById("book-info");
-      bookInfoDiv.innerHTML = "";
-      _.forEach(response.data.works, (work) => {
-        const title = work.title;
-        const authorNames = _.map(work.authors, "name");
-        const workKey = work.key;
-
-        const bookContainer = document.createElement("div");
-        bookContainer.dataset.workKey = workKey;
-        bookContainer.innerHTML = `<h3>${title}</h3><p>${authorNames}</p>`;
-        bookContainer.addEventListener("click", fetchDescription);
-        bookInfoDiv.appendChild(bookContainer);
-      });
-
-      loadMoreBtn.innerHTML = `<button id="load-more">Load More</button>`;
-      document.body.appendChild(loadMoreBtn);
-      document.getElementById("load-more").addEventListener("click", loadMore);
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  fetchBooks(null, offset);
 };
 
-document.getElementById("search-box").addEventListener("submit", apiCall);
+document
+  .getElementById("search-box")
+  .addEventListener("submit", (event) => fetchBooks(event, 0, true));
