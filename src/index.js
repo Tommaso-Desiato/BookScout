@@ -1,4 +1,6 @@
 import _ from "lodash";
+import "./style.css";
+
 const axios = require("axios");
 
 //Funzione per generare l'endpoint
