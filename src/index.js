@@ -13,10 +13,12 @@ const displayResults = (response) => {
     const title = work.title;
     const authorNames = _.map(work.authors, "name");
     const workKey = work.key;
+    const coverId = work.cover_id;
 
+    //Crea un div per visualizzare ogni libro
     const bookContainer = document.createElement("div");
     bookContainer.dataset.workKey = workKey;
-    bookContainer.innerHTML = `<h3>${title}</h3><p>${authorNames}</p>`;
+    bookContainer.innerHTML = `<h3>${title}</h3> <img src="https://covers.openlibrary.org/b/id/${coverId}-M.jpg" /> <p>${authorNames}</p>`;
     bookContainer.addEventListener("click", fetchDescription);
     bookInfoDiv.appendChild(bookContainer);
   });
