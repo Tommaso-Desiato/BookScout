@@ -21,7 +21,7 @@ const displayResults = (response) => {
     const bookContainer = document.createElement("div");
     bookContainer.dataset.workKey = workKey;
     bookContainer.className =
-      "bg-white p-4 rounded shadow hover:shadow-lg transition-shadow duration-300 flex flex-col items-center";
+      "bg-white p-4 rounded shadow hover:shadow-lg transition-shadow duration-300 flex flex-col items-center cursor-pointer";
     bookContainer.innerHTML = `
       <h3 class="text-xl font-bold mb-2 text-center">${title}</h3> 
       <img src="https://covers.openlibrary.org/b/id/${coverId}-L.jpg" alt="${title} cover" class="w-11/12 h-auto object-cover mb-2" /> 
@@ -48,6 +48,13 @@ const fetchBooks = (event, offset = 0, isNewSearch = false) => {
 
       displayResults(response);
 
+      const returnTopBtn = document.createElement("button");
+      returnTopBtn.innerHTML = `<button id="return-top"
+      class= "bg-indigo-600 text-white rounded-full w-10 h-10 shadow-lg hover:bg-indigo-700 transition transition-opacity opacity-0 pointer-events-none fixed bottom-10 right-4 flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+      </button>`;
       loadMoreBtn.innerHTML = `<button id="load-more"
       class= "bg-indigo-600 text-white py-2 px-4 rounded">
       Load More
@@ -56,6 +63,12 @@ const fetchBooks = (event, offset = 0, isNewSearch = false) => {
         "load-more-btn-container"
       );
       loadMoreBtnContainer.appendChild(loadMoreBtn);
+      document.body.appendChild(returnTopBtn);
+      document
+        .getElementById("return-top")
+        .addEventListener("click", () =>
+          window.scrollTo({ top: 0, behavior: "smooth" })
+        );
       document.getElementById("load-more").addEventListener("click", loadMore);
     })
     .catch((error) => {
@@ -100,3 +113,14 @@ const loadMore = () => {
 document
   .getElementById("search-box")
   .addEventListener("submit", (event) => fetchBooks(event, 0, true));
+
+window.addEventListener("scroll", function () {
+  const button = document.getElementById("return-top");
+  if (window.scrollY > 100) {
+    button.classList.remove("opacity-0", "pointer-events-none");
+    button.classList.add("opacity-100");
+  } else {
+    button.classList.remove("opacity-100");
+    button.classList.add("opacity-0", "pointer-events-none");
+  }
+});
