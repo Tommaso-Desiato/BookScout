@@ -8,7 +8,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: "Book Finder",
+      title: "BookScout",
       template: "./src/index.html",
     }),
   ],
