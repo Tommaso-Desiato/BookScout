@@ -31,7 +31,7 @@ module.exports = (env, argv) => {
         }),
     ].filter(Boolean),
     output: {
-      filename: "[name].[contenthash].bundle.js",
+      filename: "bundle.js",
       path: path.resolve(__dirname, "dist"),
       clean: true,
       publicPath: "/",
@@ -68,7 +68,7 @@ module.exports = (env, argv) => {
     },
     optimization: {
       splitChunks: {
-        chunks: "all",
+        chunks: "async",
       },
       minimize: isProduction,
       minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
