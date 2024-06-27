@@ -42,13 +42,13 @@
 ## About The Project
 
 [![Product Name Screen Shot][product-screenshot]](https://tommaso-desiato.github.io/BookScout/)
-Welcome to the BookScout Application, developed to encourage book reading through the Open Library external service.
+Welcome to BookScout, developed to encourage book reading through the Open Library external service.
 The application includes a simple, Google-style textbox allowing users to search for books in a specific category. Upon clicking the search button, the application contacts the Open Library API and retrieves a list of books from the specified category and displays the titles, cover and author names.
 When you click on a book, the application fetches the book's description using another Open Library API. This is done by passing the book's key, found in the previous response.
 
 This application leverages the extensive Open Library database to provide users with an easy and efficient way to discover and learn more about books in their favorite categories.
 
-Thank you for exploring the Book Finder Application!
+Thank you for exploring BookScout!
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
